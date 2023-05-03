@@ -1,0 +1,27 @@
+# permissions for end users to view myservices.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: myservice-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: myservice
+    app.kubernetes.io/part-of: myservice
+    app.kubernetes.io/managed-by: kustomize
+  name: myservice-viewer-role
+rules:
+- apiGroups:
+  - webapp.my.domain
+  resources:
+  - myservices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - webapp.my.domain
+  resources:
+  - myservices/status
+  verbs:
+  - get

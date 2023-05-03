@@ -1,0 +1,12 @@
+apiVersion: webapp.my.domain/v1
+kind: MyService
+metadata:
+  labels:
+    app.kubernetes.io/name: myservice
+    app.kubernetes.io/instance: myservice-sample
+    app.kubernetes.io/part-of: myservice
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: myservice
+  name: myservice-sample
+spec:
+  # TODO(user): Add fields here
