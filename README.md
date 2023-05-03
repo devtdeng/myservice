@@ -51,11 +51,11 @@ type MyServiceSpec struct {
 make install 
 ```
 
-8. Start the controller, it will connect to kuber-api. 
+8. Start the controller, it will connect to kube-apiserver. 
 ```sh
 make run
 ```
-9. (Option) Instead of step 8, the controlle can be built as docker image and deployed on Kubernetes cluster, other than run it at local as step 8, please find the script in Makefile
+9. (Option) Instead of step 8, the controller can be built as docker image and deployed on Kubernetes cluster, other than run it at local as step 8, please find the script in Makefile
 - docker-buildx: build image cross platform 
 - deploy - deploy the image to cluster 
 
