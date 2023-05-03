@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,8 +29,11 @@ type MyServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of MyService. Edit myservice_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	DeploymentReplicas int32              `json:"deploymentReplicas"`
+	DeploymentImage    string             `json:"deploymentImage"`
+	ServiceType        corev1.ServiceType `json:"serviceType"`
+	Command            []string           `json:"command,omitempty"`
+	Args               []string           `json:"args,omitempty"`
 }
 
 // MyServiceStatus defines the observed state of MyService

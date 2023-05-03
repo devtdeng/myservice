@@ -9,4 +9,6 @@ metadata:
     app.kubernetes.io/created-by: myservice
   name: myservice-sample
 spec:
-  # TODO(user): Add fields here
+  deploymentReplicas: 3
+  deploymentImage: nginx:latest
+  serviceType: NodePort

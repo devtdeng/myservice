@@ -35,10 +35,26 @@ spec:
           spec:
             description: MyServiceSpec defines the desired state of MyService
             properties:
-              foo:
-                description: Foo is an example field of MyService. Edit myservice_types.go
-                  to remove/update
+              args:
+                items:
+                  type: string
+                type: array
+              command:
+                items:
+                  type: string
+                type: array
+              deploymentImage:
                 type: string
+              deploymentReplicas:
+                format: int32
+                type: integer
+              serviceType:
+                description: Service Type string describes ingress methods for a service
+                type: string
+            required:
+            - deploymentImage
+            - deploymentReplicas
+            - serviceType
             type: object
           status:
             description: MyServiceStatus defines the observed state of MyService
