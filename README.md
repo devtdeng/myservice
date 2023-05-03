@@ -55,6 +55,9 @@ make install
 ```sh
 make run
 ```
+9. (Option) Instead of step 8, the controlle can be built as docker image and deployed on Kubernetes cluster, other than run it at local as step 8, please find the script in Makefile
+- docker-buildx: build image cross platform 
+- deploy - deploy the image to cluster 
 
 ## Test
 1. Edit sample config/samples/webapp_v1_myservice.yaml, add mandatory properties - deploymentImage, serviceType
@@ -94,8 +97,8 @@ curl http://<NodeIP>:<NodePort>
 make uninstall
 ```
 
-### Undeploy controller
-UnDeploy the controller from the cluster:
+### (Option) Undeploy controller 
+UnDeploy the controller from the cluster if it was deployed above. 
 
 ```sh
 make undeploy
