@@ -1,34 +1,94 @@
 # myservice
-// TODO(user): Add simple overview of use/purpose
 
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+The sample explains the steps to extend Kubernetes APIs by adding CRD and controller. 
 
-## Getting Started
-You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
-**Note:** Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
+## Prerequisites
+- Install kubebuilder, please refer to [Quick Start](https://book.kubebuilder.io/quick-start.html).
+- Install XCode on OSX with `xcode-select --install`.
+- You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster. Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
 
-### Running on the cluster
-1. Install Instances of Custom Resources:
-
-```sh
-kubectl apply -f config/samples/
-```
-
-2. Build and push your image to the location specified by `IMG`:
+## Create CRD and controller
+1. Create a directory and initialize project 
 
 ```sh
-make docker-build docker-push IMG=<some-registry>/myservice:tag
+mkdir ~/myservice && cd myservice
+kubebuilder init --domain my.domain --repo my.domain/myservice
 ```
 
-3. Deploy the controller to the cluster with the image specified by `IMG`:
+2. Create API with group and kind name
 
 ```sh
-make deploy IMG=<some-registry>/myservice:tag
+kubebuilder create api --group webapp --version v1 --kind MyService 
 ```
 
-### Uninstall CRDs
-To delete the CRDs from the cluster:
+3. Create CRD and other relavent yaml
+
+```sh
+make manifests
+```
+
+4. Edit MyServiceSpec - api/v1/myservice_types.go, to add additional property in MyServiceSpec
+```
+type MyServiceSpec struct {
+	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
+
+	DeploymentReplicas int32              `json:"deploymentReplicas"`
+	DeploymentImage    string             `json:"deploymentImage"`
+	ServiceType        corev1.ServiceType `json:"serviceType"`
+	Command            []string           `json:"command,omitempty"`
+	Args               []string           `json:"args,omitempty"`
+}
+```
+
+5. Edit Reconcile function in controllers/myservice_controller.go, add details how it handles update of MyService objects
+
+6. `make` to update CRD
+
+7. Apply the CRD to Kubernetes cluster
+```sh
+make install 
+```
+
+8. Start the controller, it will connect to kuber-api. 
+```sh
+make run
+```
+
+## Test
+1. Edit sample config/samples/webapp_v1_myservice.yaml, add mandatory properties - deploymentImage, serviceType
+```
+apiVersion: webapp.my.domain/v1
+kind: MyService
+metadata:
+  labels:
+    app.kubernetes.io/name: myservice
+    app.kubernetes.io/instance: myservice-sample
+    app.kubernetes.io/part-of: myservice
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: myservice
+  name: myservice-sample
+spec:
+  deploymentReplicas: 3
+  deploymentImage: nginx:latest
+  serviceType: NodePort
+```
+
+2. Apply the MyService object - myservice-sample to cluster 
+```sh
+kubectl apply -f config/samples/webapp_v1_myservice.yaml
+```
+
+3. Confirm it is deployed and accessible. 
+```sh
+kubectl get node -owide
+kubectl get service myservice-sample
+curl http://<NodeIP>:<NodePort>
+```
+
+## Cleanup
+### Delete the CRDs from the cluster:
 
 ```sh
 make uninstall
@@ -40,55 +100,3 @@ UnDeploy the controller from the cluster:
 ```sh
 make undeploy
 ```
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-### How it works
-This project aims to follow the Kubernetes [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
-
-It uses [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/),
-which provide a reconcile function responsible for synchronizing resources until the desired state is reached on the cluster.
-
-### Test It Out
-1. Install the CRDs into the cluster:
-
-```sh
-make install
-```
-
-2. Run your controller (this will run in the foreground, so switch to a new terminal if you want to leave it running):
-
-```sh
-make run
-```
-
-**NOTE:** You can also run this in one step by running: `make install run`
-
-### Modifying the API definitions
-If you are editing the API definitions, generate the manifests such as CRs or CRDs using:
-
-```sh
-make manifests
-```
-
-**NOTE:** Run `make --help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2023.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
