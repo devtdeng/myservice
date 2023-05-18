@@ -116,7 +116,47 @@ make deploy
 
 4. Test the controller with same step 1~3 in Test section. 
 
-5. Udeploy controller, it will delete CRDs, controllers and other stuffs from the k8s cluster 
+5. Step 4 will fails because of error 
+```
+2023-05-18T08:25:44Z	ERROR	Reconciler error	{"controller": "myservice", "controllerGroup": "webapp.my.domain", "controllerKind": "MyService", "MyService": {"name":"myservice-sample","namespace":"default"}, "namespace": "default", "name": "myservice-sample", "reconcileID": "70a9a2a8-31b9-4009-9d85-d5e2a2cea9da", "error": "deployments.apps is forbidden: User \"system:serviceaccount:myservice-system:myservice-controller-manager\" cannot create resource \"deployments\" in API group \"apps\" in the namespace \"default\""}
+```
+
+6. Modify RBAC configuration config/rbac/role.yaml, add necessary permissions
+```
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch  
+```
+
+redeploy 
+```
+bin/kustomize build config/default | kubectl apply -f -
+```
+
+6. Rerun test section and confirm myservice sample can be successfully deployed.  
+
+7. Udeploy controller, it will delete CRDs, controllers and other stuffs from the k8s cluster 
 
 ```sh
 make undeploy
