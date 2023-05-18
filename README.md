@@ -55,9 +55,6 @@ make install
 ```sh
 make run
 ```
-9. (Option) Instead of step 8, the controller can be built as docker image and deployed on Kubernetes cluster, other than run it at local as step 8, please find the script in Makefile
-- docker-buildx: build image cross platform 
-- deploy - deploy the image to cluster 
 
 ## Test
 1. Edit sample config/samples/webapp_v1_myservice.yaml, add mandatory properties - deploymentImage, serviceType
@@ -90,15 +87,36 @@ kubectl get service myservice-sample
 curl http://<NodeIP>:<NodePort>
 ```
 
-## Cleanup
-### Delete the CRDs from the cluster:
-
+5. clean up MyService object and CRDs
 ```sh
+kubectl delete -f config/samples/webapp_v1_myservice.yaml
 make uninstall
 ```
 
-### (Option) Undeploy controller 
-UnDeploy the controller from the cluster if it was deployed above. 
+## Deploy controller on K8s cluster
+In above test section, the controller runs on local and connect to k8s cluster with kubeconfig credentials, in this section, the controller will be deployed on k8s cluster and connect access api-server with RBAC configuration. 
+
+1. Prepare one image registry, for example Harbor. 
+
+2. Configure image URL in Makefile
+```
+IMG ?= <IMAGE_REGISTRY>/><PATH>/controller:latest
+```
+
+2. Create and push docker image, please review details of Dockfile
+```sh
+make docker-build
+make docker-push
+```
+
+3. Deploy CRDs, controller and depedencies to k8s cluster
+```sh
+make deploy
+```
+
+4. Test the controller with same step 1~3 in Test section. 
+
+5. Udeploy controller, it will delete CRDs, controllers and other stuffs from the k8s cluster 
 
 ```sh
 make undeploy
